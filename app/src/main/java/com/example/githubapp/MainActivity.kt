@@ -6,6 +6,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.githubapp.adapter.UserAdapter
+import com.example.githubapp.databinding.ActivityMainBinding
 import com.example.githubapp.model.Repo
 import com.example.githubapp.model.UserDto
 import com.example.githubapp.network.GithubService
@@ -17,9 +20,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.github.com/")
@@ -37,15 +44,25 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        githubService.searchUsers("square").enqueue(object: retrofit2.Callback<UserDto> {
-            override fun onResponse(call: Call<UserDto>, response: Response<UserDto>) {
-                Log.e("MainActivity","Search User : ${response.body().toString()}")
-            }
-
-            override fun onFailure(call: Call<UserDto>, t: Throwable) {
-            }
 
 
-        })
-    }
-}
+        val userAdapter = UserAdapter()
+
+        binding.userRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = userAdapter
+        }
+            githubService.searchUsers("squar").enqueue(object: retrofit2.Callback<UserDto> {
+                override fun onResponse(call: Call<UserDto>, response: Response<UserDto>) {
+                    Log.e("MainActivity","Search User : ${response.body().toString()}")
+
+                    userAdapter.submitList(response.body()?.items)
+                }
+
+                override fun onFailure(call: Call<UserDto>, t: Throwable) {
+                }
+
+
+            })
+    }}
+
