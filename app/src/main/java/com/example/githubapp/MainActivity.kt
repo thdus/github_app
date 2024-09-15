@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.githubapp.model.Repo
+import com.example.githubapp.model.UserDto
 import com.example.githubapp.network.GithubService
 import okhttp3.Callback
 import retrofit2.Call
@@ -28,11 +29,20 @@ class MainActivity : AppCompatActivity() {
         val githubService = retrofit.create(GithubService::class.java)
         githubService.listRepos("square").enqueue(object: retrofit2.Callback<List<Repo>> {
             override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
-                Log.e("mainactivity", response.body().toString())
+                Log.e("mainactivity", "List Repo : ${response.body().toString()}")
             }
 
             override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
 
+            }
+        })
+
+        githubService.searchUsers("square").enqueue(object: retrofit2.Callback<UserDto> {
+            override fun onResponse(call: Call<UserDto>, response: Response<UserDto>) {
+                Log.e("MainActivity","Search User : ${response.body().toString()}")
+            }
+
+            override fun onFailure(call: Call<UserDto>, t: Throwable) {
             }
 
 
